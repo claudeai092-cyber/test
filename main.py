@@ -131,7 +131,7 @@ def login(req: LoginRequest):
     conn = get_conn()
     user = conn.execute(
         "SELECT id, username, full_name, role FROM users WHERE username=? AND password=?",
-        (req.username, hash_pass(req.password))
+        (req.username, req.password)
     ).fetchone()
     conn.close()
 
@@ -139,6 +139,7 @@ def login(req: LoginRequest):
         raise HTTPException(status_code=401, detail="Błędny login lub hasło")
 
     token = create_token(user["id"], user["username"], user["role"])
+
     return {
         "token": token,
         "user": {
